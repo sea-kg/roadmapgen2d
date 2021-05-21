@@ -14,6 +14,7 @@ import png
 # from roadmapgen2d.roadmapgen2d import RoadMapGen2D
 from roadmapgen2d.__pkginfo__ import version
 from roadmapgen2d.__pkginfo__ import name
+from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
 
 roads_generation_n = 0
 
@@ -424,28 +425,37 @@ if __name__ == "__main__":
     if sys.argv[1] == '--version':
         print(name + ' v' + version)
         sys.exit(0)
+    if sys.argv[1] == '--create-example-config':
+        print("TODO")
+        sys.exit(0)
     if sys.argv[1] == '--help':
         print("""
 """ + name + ' v' + version + """
 Arg can be:
 --version - print version
 --help - print help
+--create-example-config - create example config (roadmapgen2d-config.json)
 """)
         sys.exit(0)
-
     ROOT_DIR = os.path.abspath(sys.argv[1])
     if not os.path.isdir(ROOT_DIR):
         sys.exit('ERROR: Directory "' + sys.argv[1] + '" did not exists.')
-
     print("Start on dir: " + ROOT_DIR)
-    
+    config = RoadMapGen2dConfig()
+    if not config.load_from_file('roadmapgen2d-config.json'):
+        tips = ""
+        if not os.path.isfile('roadmapgen2d-config.json'):
+            tips = "\n  Note: for create use a --create-example-config"
+        sys.exit(
+            "ERROR: could not load roadmapgen2d-config.json" + tips
+        )
+
     if not os.path.isdir(".roads-generation"):
         os.mkdir('.roads-generation')
 
     os.system("rm -rf .roads-generation/*.png")
 
-
-    with open('map.json',) as file_map:
+    with open('roadmapgen2d-config.json',) as file_map:
         data = json.load(file_map)
         w = data['width']
         h = data['height']
