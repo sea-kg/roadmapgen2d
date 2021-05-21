@@ -11,7 +11,7 @@ from random import randrange
 import math
 import png
 
-from roadmapgen2d.roadmapgen2d import RoadMapGen2D
+# from roadmapgen2d.roadmapgen2d import RoadMapGen2D
 from roadmapgen2d.__pkginfo__ import version
 from roadmapgen2d.__pkginfo__ import name
 

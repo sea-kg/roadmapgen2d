@@ -5,4 +5,4 @@
 """Library for cpplint"""
 
 from roadmapgen2d.__pkginfo__ import version as __version__
-from roadmapgen2d.roadmapgen2d_write_map_to_image import Rmg2DWriteMapToImage
+from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
