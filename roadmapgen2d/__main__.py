@@ -15,6 +15,7 @@ import png
 from roadmapgen2d.__pkginfo__ import version
 from roadmapgen2d.__pkginfo__ import name
 from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
+from roadmapgen2d.roadmapgen2d_map import RoadMapGen2dMap
 
 roads_generation_n = 0
 
@@ -26,6 +27,7 @@ max_pw = 0
 max_ph = 0
 # Opening JSON file
 ypixelmap = []
+MAP = None
 
 def write_map_to_image(_config):
     global roads_generation_n
@@ -454,6 +456,8 @@ Arg can be:
         sys.exit(
             "ERROR: could not load roadmapgen2d-config.json" + tips
         )
+
+    MAP = RoadMapGen2dMap(config.get_map_width(), config.get_map_height())
 
     if not os.path.isdir(".roads-generation"):
         os.mkdir('.roads-generation')
