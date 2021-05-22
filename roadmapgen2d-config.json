@@ -1,6 +1,6 @@
 {
-    "map-width": 100,
-    "map-height": 100,
+    "map-width": 42,
+    "map-height": 42,
     "random-max-points": 100,
     "create-video": false
 }
