@@ -22,15 +22,12 @@ read0_texture = "textures/road0.png"
 read0_texture_width = 120
 read0_texture_height = 120
 
-max_main_points = 50
 max_pw = 0
 max_ph = 0
 # Opening JSON file
 ypixelmap = []
 
-write_pictures = True
-
-def write_map_to_image():
+def write_map_to_image(_config):
     global roads_generation_n
     # filename
     filename = str(roads_generation_n)
@@ -38,7 +35,7 @@ def write_map_to_image():
         filename = "0" + filename
     filename = '.roads-generation/roadmap' + filename + '.png'
     roads_generation_n += 1
-    if not write_pictures:
+    if not _config.is_create_video():
         return
     print("Write to file " + filename)
     cell_size = 10
@@ -57,7 +54,6 @@ def write_map_to_image():
 
         for i in range(cell_size):
             img.append(rows[i])
-        
     with open(filename, 'wb') as f:
         w = png.Writer(max_pw*cell_size, max_ph*cell_size, greyscale=False)
         w.write(f, img)
@@ -73,6 +69,7 @@ def reset_map(max_pw, max_ph):
         ipw += 1
 
 def is_allowed(x,y):
+    """ is_allowed """
     if is_border(x, y):
         return False
     x = x - 1
@@ -87,24 +84,27 @@ def is_allowed(x,y):
                 return False
     return True
 
-def try_change_to_true(x,y):
+def try_change_to_true(_config, x,y):
+    """ try_change_to_true """
     ypixelmap[x][y] = True
-    write_map_to_image()
+    write_map_to_image(config)
     if not is_allowed(x,y):
         ypixelmap[x][y] = False
-        write_map_to_image()
+        write_map_to_image(_config)
         return False
     return True
 
-def random_main_points():
+def random_main_points(_config):
+    """ random_main_points """
     immp = 0
-    while immp < max_main_points:
+    while immp < _config.get_random_max_points():
         x = randrange(max_pw - 2) + 1
         y = randrange(max_ph - 2) + 1
-        if try_change_to_true(x,y):
+        if try_change_to_true(_config, x,y):
             immp += 1
 
 def print_map():
+    """ print map to console """
     for line in ypixelmap:
         res_line = ''
         for i in line:
@@ -186,7 +186,7 @@ def find_deadlock_points():
         x += 1
     return deadlock_points
 
-def check_and_random_move(x,y):
+def check_and_random_move(_config, x,y):
     if is_border(x, y):
         return False
     ret = 0
@@ -194,80 +194,85 @@ def check_and_random_move(x,y):
         ret += 1
         ypixelmap[x+1][y+1] = False
         if randrange(2) == 0:
-            try_change_to_true(x,y+1)
+            try_change_to_true(_config, x,y+1)
         else:
-            try_change_to_true(x+1,y)
+            try_change_to_true(_config, x+1,y)
     if not ypixelmap[x][y] and not ypixelmap[x+1][y+1] and ypixelmap[x][y+1] and ypixelmap[x+1][y]:
         ret += 1
         ypixelmap[x][y+1] = False
         if randrange(2) == 0:
-            try_change_to_true(x,y)
+            try_change_to_true(_config, x,y)
         else:
-            try_change_to_true(x+1,y+1)
+            try_change_to_true(_config, x+1,y+1)
     return ret
 
-def move_diagonal_tails():
+def move_diagonal_tails(_config):
     x = 0
     ret = 0
     for x_line in ypixelmap:
         y = 0
         for _ in x_line:
-            ret += check_and_random_move(x, y)
+            ret += check_and_random_move(_config, x, y)
             y += 1
         x += 1
     return ret
 
-def move_diagonal_tails_loop():
-    mdt = move_diagonal_tails()
+def move_diagonal_tails_loop(_config):
+    """ move_diagonal_tails_loop """
+    mdt = move_diagonal_tails(_config)
     while mdt > 0:
-        mdt = move_diagonal_tails()
+        mdt = move_diagonal_tails(_config,)
 
-def drawline_by_y(x0,x1,y):
+def drawline_by_y(_config, x0, x1, y):
     ret = 0
     ix = min(x0,x1)
     mx = max(x0,x1)
     while ix <= mx:
         if not ypixelmap[ix][y]:
-            if try_change_to_true(ix,y):
+            if try_change_to_true(_config, ix,y):
                 ret += 1
         ix += 1
     return ret
 
-def drawline_by_x(y0,y1,x):
+def drawline_by_x(_config, y0, y1, x):
+    """ drawline_by_x """
     ret = 0
     iy = min(y0,y1)
     my = max(y0,y1)
     while iy <= my:
         if not ypixelmap[x][iy]:
-            if try_change_to_true(x,iy):
+            if try_change_to_true(_config, x,iy):
                 ret += 1
         iy += 1
     return ret
 
-def connect_points(p0, p1):
+def connect_points(_config, point0, point1):
+    """ connect_points """
     ret = 0
-    x0 = p0['x']
-    y0 = p0['y']
-    x1 = p1['x']
-    y1 = p1['y']
+    x0 = point0['x']
+    y0 = point0['y']
+    x1 = point1['x']
+    y1 = point1['y']
     n = randrange(2)
     if n == 0:
-        ret += drawline_by_y(x0, x1, y0)
-        ret += drawline_by_x(y0, y1, x1)
+        ret += drawline_by_y(_config, x0, x1, y0)
+        ret += drawline_by_x(_config, y0, y1, x1)
     else:
-        ret += drawline_by_x(y0, y1, x0)
-        ret += drawline_by_y(x0, x1, y1)
+        ret += drawline_by_x(_config, y0, y1, x0)
+        ret += drawline_by_y(_config, x0, x1, y1)
     return ret
 
-def remove_single_points():
-    points = find_single_points()
-    for p in points:
-        x = p['x']
-        y = p['y']
+def remove_single_points(_config):
+    """ remove_single_points """
+    _points = find_single_points()
+    for _point in _points:
+        x = _point['x']
+        y = _point['y']
         ypixelmap[x][y] = False
-        write_map_to_image()
+        write_map_to_image(_config)
 
 def is_rame(x, y):
+    """ is_rame """
     if is_border(x, y):
         return False
     if not ypixelmap[x][y]:
@@ -292,14 +297,14 @@ def is_rame(x, y):
         return True
     return False
 
-def remove_rames():
+def remove_rames(_config):
     x = 0
     for x_line in ypixelmap:
         y = 0
         for _ in x_line:
             if is_rame(x, y):
                 ypixelmap[x][y] = False
-                write_map_to_image()
+                write_map_to_image(_config)
             y += 1
         x += 1
 
@@ -314,18 +319,18 @@ def can_connect_close_points(x,y):
         return True
     return False
 
-def connect_all_close_points():
+def connect_all_close_points(_config):
     x = 0
     for x_line in ypixelmap:
         y = 0
         for _ in x_line:
             _around_n = get_around_count(x, y)
             if can_connect_close_points(x, y) and _around_n < 6:
-                try_change_to_true(x,y)
+                try_change_to_true(_config, x,y)
             y += 1
         x += 1
 
-def remove_all_short_cicles():
+def remove_all_short_cicles(_config):
     ret = 0
     x = 0
     for x_line in ypixelmap:
@@ -342,13 +347,13 @@ def remove_all_short_cicles():
                 elif n == 2:
                     ypixelmap[x-1][y] = False
                 ret +=1
-                write_map_to_image()
+                write_map_to_image(_config)
             y += 1
         x += 1
     return ret
 
-def remove_all_short_cicles_loop():
-    while remove_all_short_cicles() > 0:
+def remove_all_short_cicles_loop(_config):
+    while remove_all_short_cicles(_config) > 0:
         pass
 
 def find_short_point_from(p0, points):
@@ -373,7 +378,7 @@ def find_short_point_from(p0, points):
             found_y1 = y1
     return {'x': found_x1, 'y': found_y1}
         
-def connect_deadlocks_loop():
+def connect_deadlocks_loop(_config):
     deadlocks = find_deadlock_points()
     len_deadlocks = len(deadlocks)
     safe_max_loop = 10
@@ -387,32 +392,32 @@ def connect_deadlocks_loop():
             y = deadlocks[0]['y']
             safe_loop -= 1
             ypixelmap[x][y] = False
-            write_map_to_image()
+            write_map_to_image(_config)
         else:
             pn0 = randrange(len_deadlocks)
             p0 = deadlocks[pn0]
             p1 = find_short_point_from(p0, deadlocks)
             # print(p0, p1)
-            connected = connect_points(p0, p1)
+            connected = connect_points(_config, p0, p1)
             if connected == 0:
                 safe_loop -= 1
                 x = p0['x']
                 y = p0['y']
                 ypixelmap[x][y] = False
-                write_map_to_image()
+                write_map_to_image(_config)
             else:
                 safe_loop -= 1
         deadlocks = find_deadlock_points()
         len_deadlocks = len(deadlocks)
 
-def remove_deadlocks_loop():
+def remove_deadlocks_loop(_config):
     deadlocks = find_deadlock_points()
     len_deadlocks = len(deadlocks)
     while len_deadlocks > 0:
         x = deadlocks[0]['x']
         y = deadlocks[0]['y']
         ypixelmap[x][y] = False
-        write_map_to_image()
+        write_map_to_image(_config)
         deadlocks = find_deadlock_points()
         len_deadlocks = len(deadlocks)
 
@@ -454,19 +459,17 @@ Arg can be:
         os.mkdir('.roads-generation')
 
     os.system("rm -rf .roads-generation/*.png")
+    max_pw = config.get_map_width()
+    max_ph = config.get_map_height()
 
     with open('roadmapgen2d-config.json',) as file_map:
         data = json.load(file_map)
-        w = data['width']
-        h = data['height']
 
-        max_pw = round(w/read0_texture_width)
-        max_ph = round(h/read0_texture_height)
         print(max_pw, max_ph)
         reset_map(max_pw, max_ph)
-        random_main_points()
+        random_main_points(config)
         print_map()
-        move_diagonal_tails_loop()
+        move_diagonal_tails_loop(config)
         print_map()
         again = True
         while again:
@@ -479,38 +482,36 @@ Arg can be:
             p0 = points[randrange(len_points)]
             p1 = points[randrange(len_points)]
             print(p0,p1)
-            connect_points(p0,p1)
-            move_diagonal_tails_loop()
+            connect_points(config, p0,p1)
+            move_diagonal_tails_loop(config)
             print_map()
 
         # remove last single point
-        remove_single_points()
-        remove_rames()
-        connect_all_close_points()
-        
+        remove_single_points(config)
+        remove_rames(config)
+        connect_all_close_points(config)
+
         print_map()
         print("------- remove_all_short_cicles -------")
-        remove_all_short_cicles_loop()
-        remove_rames()
-        move_diagonal_tails_loop()
+        remove_all_short_cicles_loop(config)
+        remove_rames(config)
+        move_diagonal_tails_loop(config)
 
         print_map()
 
         print("------- connect_deadlocks_loop -------")
-        connect_deadlocks_loop()
-        # move_diagonal_tails_loop()
+        connect_deadlocks_loop(config)
+        # move_diagonal_tails_loop(config)
 
-        remove_all_short_cicles_loop()
-        remove_rames()
-        move_diagonal_tails_loop()
-        remove_deadlocks_loop()
-        remove_single_points()
-        remove_rames()
-
+        remove_all_short_cicles_loop(config)
+        remove_rames(config)
+        move_diagonal_tails_loop(config)
+        remove_deadlocks_loop(config)
+        remove_single_points(config)
+        remove_rames(config)
         print_map()
-        
         print("------- done -------")
-        write_map_to_image()
+        write_map_to_image(config)
         print_map()
 
     print("All frames: " + str(roads_generation_n))
@@ -520,10 +521,10 @@ Arg can be:
     if os.path.isfile('video.avi'):
         os.remove('video.avi')
 
-    if write_pictures:
+    if config.is_create_video():
         # last frame in last 5 seconds
         for _ in range(frames_per_secons*5):
-            write_map_to_image()
+            write_map_to_image(config)
 
         print("Frames per second: " + str(frames_per_secons))
         os.system('ffmpeg -f image2 -r ' + str(frames_per_secons) + ' -i .roads-generation/roadmap%06d.png -i "../app/music/sea5kg - 02 Diphdo.ogg" -acodec libmp3lame -b 192k video.avi')
