@@ -25,8 +25,7 @@ read0_texture_height = 120
 
 max_pw = 0
 max_ph = 0
-# Opening JSON file
-ypixelmap = []
+
 MAP = None
 
 def write_map_to_image(_config):
@@ -42,7 +41,7 @@ def write_map_to_image(_config):
     print("Write to file " + filename)
     cell_size = 10
     img = []
-    for line in ypixelmap:
+    for line in MAP.ypixelmap:
         rows = []
         for i in range(cell_size):
             rows.append(())
@@ -60,54 +59,18 @@ def write_map_to_image(_config):
         w = png.Writer(max_pw*cell_size, max_ph*cell_size, greyscale=False)
         w.write(f, img)
 
-def reset_map(max_pw, max_ph):
-    ipw = 0
-    while ipw < max_pw:
-        iph = 0
-        ypixelmap.append([])
-        while iph < max_pw:
-            ypixelmap[ipw].append(False)
-            iph += 1
-        ipw += 1
-
-def is_allowed(x,y):
-    """ is_allowed """
-    if is_border(x, y):
-        return False
-    x = x - 1
-    y = y - 1
-    for x0 in range(2):
-        for y0 in range(2):
-            b1 = ypixelmap[x + x0  ][y + y0]
-            b2 = ypixelmap[x + x0+1][y + y0]
-            b3 = ypixelmap[x + x0+1][y + y0+1]
-            b4 = ypixelmap[x + x0  ][y + y0+1]
-            if b1 and b2 and b3 and b4:
-                return False
-    return True
-
-def try_change_to_true(_config, x,y):
-    """ try_change_to_true """
-    ypixelmap[x][y] = True
-    write_map_to_image(config)
-    if not is_allowed(x,y):
-        ypixelmap[x][y] = False
-        write_map_to_image(_config)
-        return False
-    return True
-
-def random_main_points(_config):
+def random_main_points(_map, _config):
     """ random_main_points """
     immp = 0
     while immp < _config.get_random_max_points():
         x = randrange(max_pw - 2) + 1
         y = randrange(max_ph - 2) + 1
-        if try_change_to_true(_config, x,y):
+        if _map.try_change_to_true(_config, x,y):
             immp += 1
 
 def print_map():
     """ print map to console """
-    for line in ypixelmap:
+    for line in MAP.ypixelmap:
         res_line = ''
         for i in line:
             if i == True:
@@ -117,15 +80,10 @@ def print_map():
             res_line += '\x1b[%sm  \x1b[0m' % (_format)
         print(res_line)
 
-def is_border(x,y):
-    if x == 0 or x == max_pw-1:
-        return True
-    if y == 0 or y == max_ph-1:
-        return True
-    return False
+
 
 def get_around_count(x, y):
-    if is_border(x, y):
+    if MAP.is_border(x, y):
         return 4
     ret = 0
     for dx in range(3):
@@ -134,14 +92,14 @@ def get_around_count(x, y):
             y0 = y + dy - 1
             if x0 == x and y0 == y:
                 continue
-            if ypixelmap[x0][y0]:
+            if MAP.ypixelmap[x0][y0]:
                 ret += 1
     return ret
 
 def is_single_point(x,y):
-    if is_border(x, y):
+    if MAP.is_border(x, y):
         return False
-    if not ypixelmap[x][y]:
+    if not MAP.ypixelmap[x][y]:
         return False
     if get_around_count(x,y) == 0:
         return True
@@ -150,7 +108,7 @@ def is_single_point(x,y):
 def find_single_points():
     single_points = []
     x = 0
-    for x_line in ypixelmap:
+    for x_line in MAP.ypixelmap:
         y = 0
         for _ in x_line:
             if is_single_point(x, y):
@@ -160,15 +118,15 @@ def find_single_points():
     return single_points
 
 def is_deadlock_point(x,y):
-    if is_border(x, y):
+    if MAP.is_border(x, y):
         return False
-    if not ypixelmap[x][y]:
+    if not MAP.ypixelmap[x][y]:
         return False
     around = [
-        ypixelmap[x-1][y],
-        ypixelmap[x+1][y],
-        ypixelmap[x][y+1],
-        ypixelmap[x][y-1],
+        MAP.ypixelmap[x-1][y],
+        MAP.ypixelmap[x+1][y],
+        MAP.ypixelmap[x][y+1],
+        MAP.ypixelmap[x][y-1],
     ]
     count = 0
     for b in around:
@@ -179,7 +137,7 @@ def is_deadlock_point(x,y):
 def find_deadlock_points():
     deadlock_points = []
     x = 0
-    for x_line in ypixelmap:
+    for x_line in MAP.ypixelmap:
         y = 0
         for _ in x_line:
             if is_deadlock_point(x, y):
@@ -189,29 +147,29 @@ def find_deadlock_points():
     return deadlock_points
 
 def check_and_random_move(_config, x,y):
-    if is_border(x, y):
+    if MAP.is_border(x, y):
         return False
     ret = 0
-    if ypixelmap[x][y] and ypixelmap[x+1][y+1] and not ypixelmap[x][y+1] and not ypixelmap[x+1][y]:
+    if MAP.ypixelmap[x][y] and MAP.ypixelmap[x+1][y+1] and not MAP.ypixelmap[x][y+1] and not MAP.ypixelmap[x+1][y]:
         ret += 1
-        ypixelmap[x+1][y+1] = False
+        MAP.ypixelmap[x+1][y+1] = False
         if randrange(2) == 0:
-            try_change_to_true(_config, x,y+1)
+            MAP.try_change_to_true(_config, x,y+1)
         else:
-            try_change_to_true(_config, x+1,y)
-    if not ypixelmap[x][y] and not ypixelmap[x+1][y+1] and ypixelmap[x][y+1] and ypixelmap[x+1][y]:
+            MAP.try_change_to_true(_config, x+1,y)
+    if not MAP.ypixelmap[x][y] and not MAP.ypixelmap[x+1][y+1] and MAP.ypixelmap[x][y+1] and MAP.ypixelmap[x+1][y]:
         ret += 1
-        ypixelmap[x][y+1] = False
+        MAP.ypixelmap[x][y+1] = False
         if randrange(2) == 0:
-            try_change_to_true(_config, x,y)
+            MAP.try_change_to_true(_config, x,y)
         else:
-            try_change_to_true(_config, x+1,y+1)
+            MAP.try_change_to_true(_config, x+1,y+1)
     return ret
 
 def move_diagonal_tails(_config):
     x = 0
     ret = 0
-    for x_line in ypixelmap:
+    for x_line in MAP.ypixelmap:
         y = 0
         for _ in x_line:
             ret += check_and_random_move(_config, x, y)
@@ -230,8 +188,8 @@ def drawline_by_y(_config, x0, x1, y):
     ix = min(x0,x1)
     mx = max(x0,x1)
     while ix <= mx:
-        if not ypixelmap[ix][y]:
-            if try_change_to_true(_config, ix,y):
+        if not MAP.ypixelmap[ix][y]:
+            if MAP.try_change_to_true(_config, ix,y):
                 ret += 1
         ix += 1
     return ret
@@ -242,8 +200,8 @@ def drawline_by_x(_config, y0, y1, x):
     iy = min(y0,y1)
     my = max(y0,y1)
     while iy <= my:
-        if not ypixelmap[x][iy]:
-            if try_change_to_true(_config, x,iy):
+        if not MAP.ypixelmap[x][iy]:
+            if MAP.try_change_to_true(_config, x,iy):
                 ret += 1
         iy += 1
     return ret
@@ -270,24 +228,24 @@ def remove_single_points(_config):
     for _point in _points:
         x = _point['x']
         y = _point['y']
-        ypixelmap[x][y] = False
+        MAP.ypixelmap[x][y] = False
         write_map_to_image(_config)
 
 def is_rame(x, y):
     """ is_rame """
-    if is_border(x, y):
+    if MAP.is_border(x, y):
         return False
-    if not ypixelmap[x][y]:
+    if not MAP.ypixelmap[x][y]:
         return False
-    b00 = ypixelmap[x-1][y-1]
-    b01 = ypixelmap[x-1][y]
-    b02 = ypixelmap[x-1][y+1]
-    b10 = ypixelmap[x  ][y-1]
+    b00 = MAP.ypixelmap[x-1][y-1]
+    b01 = MAP.ypixelmap[x-1][y]
+    b02 = MAP.ypixelmap[x-1][y+1]
+    b10 = MAP.ypixelmap[x  ][y-1]
     # b11 = ypixelmap[x  ][y]
-    b12 = ypixelmap[x  ][y+1]
-    b20 = ypixelmap[x+1][y-1]
-    b21 = ypixelmap[x+1][y]
-    b22 = ypixelmap[x+1][y+1]
+    b12 = MAP.ypixelmap[x  ][y+1]
+    b20 = MAP.ypixelmap[x+1][y-1]
+    b21 = MAP.ypixelmap[x+1][y]
+    b22 = MAP.ypixelmap[x+1][y+1]
 
     if b00 and b01 and b02 and not b10 and not b12 and not b20 and not b21 and not b22:
         return True
@@ -301,53 +259,53 @@ def is_rame(x, y):
 
 def remove_rames(_config):
     x = 0
-    for x_line in ypixelmap:
+    for x_line in MAP.ypixelmap:
         y = 0
         for _ in x_line:
             if is_rame(x, y):
-                ypixelmap[x][y] = False
+                MAP.ypixelmap[x][y] = False
                 write_map_to_image(_config)
             y += 1
         x += 1
 
 def can_connect_close_points(x,y):
-    if is_border(x, y):
+    if MAP.is_border(x, y):
         return False
-    if ypixelmap[x][y]:
+    if MAP.ypixelmap[x][y]:
         return False
-    if ypixelmap[x][y+1] and ypixelmap[x][y-1]:
+    if MAP.ypixelmap[x][y+1] and MAP.ypixelmap[x][y-1]:
         return True
-    if ypixelmap[x+1][y] and ypixelmap[x-1][y]:
+    if MAP.ypixelmap[x+1][y] and MAP.ypixelmap[x-1][y]:
         return True
     return False
 
 def connect_all_close_points(_config):
     x = 0
-    for x_line in ypixelmap:
+    for x_line in MAP.ypixelmap:
         y = 0
         for _ in x_line:
             _around_n = get_around_count(x, y)
             if can_connect_close_points(x, y) and _around_n < 6:
-                try_change_to_true(_config, x,y)
+                MAP.try_change_to_true(_config, x,y)
             y += 1
         x += 1
 
 def remove_all_short_cicles(_config):
     ret = 0
     x = 0
-    for x_line in ypixelmap:
+    for x_line in MAP.ypixelmap:
         y = 0
         for _ in x_line:
-            if get_around_count(x, y) == 8 and not ypixelmap[x][y]:
+            if get_around_count(x, y) == 8 and not MAP.ypixelmap[x][y]:
                 n = randrange(4)
                 if n == 0:
-                    ypixelmap[x][y+1] = False
+                    MAP.ypixelmap[x][y+1] = False
                 elif n == 1:
-                    ypixelmap[x][y-1] = False
+                    MAP.ypixelmap[x][y-1] = False
                 elif n == 2:
-                    ypixelmap[x+1][y] = False
+                    MAP.ypixelmap[x+1][y] = False
                 elif n == 2:
-                    ypixelmap[x-1][y] = False
+                    MAP.ypixelmap[x-1][y] = False
                 ret +=1
                 write_map_to_image(_config)
             y += 1
@@ -363,7 +321,7 @@ def find_short_point_from(p0, points):
     y0 = p0['y']
     found_x1 = x0
     found_y1 = y0
-    dist = len(ypixelmap) + len(ypixelmap[0]) + 1 # max dist
+    dist = len(MAP.ypixelmap) + len(MAP.ypixelmap[0]) + 1 # max dist
     for p1 in points:
         x1 = p1['x']
         y1 = p1['y']
@@ -379,7 +337,7 @@ def find_short_point_from(p0, points):
             found_x1 = x1
             found_y1 = y1
     return {'x': found_x1, 'y': found_y1}
-        
+
 def connect_deadlocks_loop(_config):
     deadlocks = find_deadlock_points()
     len_deadlocks = len(deadlocks)
@@ -393,7 +351,7 @@ def connect_deadlocks_loop(_config):
             x = deadlocks[0]['x']
             y = deadlocks[0]['y']
             safe_loop -= 1
-            ypixelmap[x][y] = False
+            MAP.ypixelmap[x][y] = False
             write_map_to_image(_config)
         else:
             pn0 = randrange(len_deadlocks)
@@ -405,7 +363,7 @@ def connect_deadlocks_loop(_config):
                 safe_loop -= 1
                 x = p0['x']
                 y = p0['y']
-                ypixelmap[x][y] = False
+                MAP.ypixelmap[x][y] = False
                 write_map_to_image(_config)
             else:
                 safe_loop -= 1
@@ -418,12 +376,10 @@ def remove_deadlocks_loop(_config):
     while len_deadlocks > 0:
         x = deadlocks[0]['x']
         y = deadlocks[0]['y']
-        ypixelmap[x][y] = False
+        MAP.ypixelmap[x][y] = False
         write_map_to_image(_config)
         deadlocks = find_deadlock_points()
         len_deadlocks = len(deadlocks)
-
-
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -457,7 +413,7 @@ Arg can be:
             "ERROR: could not load roadmapgen2d-config.json" + tips
         )
 
-    MAP = RoadMapGen2dMap(config.get_map_width(), config.get_map_height())
+    MAP = RoadMapGen2dMap(config)
 
     if not os.path.isdir(".roads-generation"):
         os.mkdir('.roads-generation')
@@ -468,10 +424,7 @@ Arg can be:
 
     with open('roadmapgen2d-config.json',) as file_map:
         data = json.load(file_map)
-
-        print(max_pw, max_ph)
-        reset_map(max_pw, max_ph)
-        random_main_points(config)
+        random_main_points(MAP, config)
         print_map()
         move_diagonal_tails_loop(config)
         print_map()
