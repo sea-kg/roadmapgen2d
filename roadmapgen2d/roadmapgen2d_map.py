@@ -5,15 +5,18 @@
 # pylint: disable=relative-beyond-top-level,missing-function-docstring
 
 """ simple map """
-
+from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
+from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
 
 class RoadMapGen2dMap:
     """ class for read config of generation image """
     __max_width = None
     __max_height = None
-    __config = None
+    __imager: RoadMapGen2dWriteMapToImage = None
+    __config: RoadMapGen2dConfig = None
     ypixelmap = []
-    def __init__(self, config):
+    def __init__(self, config, imager):
+        self.__imager = imager
         self.__config = config
         self.__max_width = self.__config.get_map_width()
         self.__max_height = self.__config.get_map_height()
@@ -58,9 +61,9 @@ class RoadMapGen2dMap:
     def try_change_to_true(self, _config, point_x, point_y):
         """ try_change_to_true """
         self.ypixelmap[point_x][point_y] = True
-        #TODO write_map_to_image(config)
+        self.__imager.write_map_to_image(self.ypixelmap)
         if not self.is_allowed(point_x, point_y):
             self.ypixelmap[point_x][point_y] = False
-            #TODO write_map_to_image(_config)
+            self.__imager.write_map_to_image(self.ypixelmap)
             return False
         return True

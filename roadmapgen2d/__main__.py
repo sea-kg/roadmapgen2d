@@ -16,8 +16,7 @@ from roadmapgen2d.__pkginfo__ import version
 from roadmapgen2d.__pkginfo__ import name
 from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
 from roadmapgen2d.roadmapgen2d_map import RoadMapGen2dMap
-
-roads_generation_n = 0
+from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
 
 read0_texture = "textures/road0.png"
 read0_texture_width = 120
@@ -27,37 +26,7 @@ max_pw = 0
 max_ph = 0
 
 MAP = None
-
-def write_map_to_image(_config):
-    global roads_generation_n
-    # filename
-    filename = str(roads_generation_n)
-    while len(filename) < 6:
-        filename = "0" + filename
-    filename = '.roads-generation/roadmap' + filename + '.png'
-    roads_generation_n += 1
-    if not _config.is_create_video():
-        return
-    print("Write to file " + filename)
-    cell_size = 10
-    img = []
-    for line in MAP.ypixelmap:
-        rows = []
-        for i in range(cell_size):
-            rows.append(())
-        for cell in line:
-            _cell = (0, 0, 0)
-            if cell == True:
-                _cell = (255, 255, 255)
-            for i in range(cell_size):
-                for _ in range(cell_size):
-                    rows[i] += _cell
-
-        for i in range(cell_size):
-            img.append(rows[i])
-    with open(filename, 'wb') as f:
-        w = png.Writer(max_pw*cell_size, max_ph*cell_size, greyscale=False)
-        w.write(f, img)
+IMAGER = None
 
 def random_main_points(_map, _config):
     """ random_main_points """
@@ -229,7 +198,7 @@ def remove_single_points(_config):
         x = _point['x']
         y = _point['y']
         MAP.ypixelmap[x][y] = False
-        write_map_to_image(_config)
+        IMAGER.write_map_to_image(MAP.ypixelmap)
 
 def is_rame(x, y):
     """ is_rame """
@@ -264,7 +233,7 @@ def remove_rames(_config):
         for _ in x_line:
             if is_rame(x, y):
                 MAP.ypixelmap[x][y] = False
-                write_map_to_image(_config)
+                IMAGER.write_map_to_image(MAP.ypixelmap)
             y += 1
         x += 1
 
@@ -307,7 +276,7 @@ def remove_all_short_cicles(_config):
                 elif n == 2:
                     MAP.ypixelmap[x-1][y] = False
                 ret +=1
-                write_map_to_image(_config)
+                IMAGER.write_map_to_image(MAP.ypixelmap)
             y += 1
         x += 1
     return ret
@@ -352,7 +321,7 @@ def connect_deadlocks_loop(_config):
             y = deadlocks[0]['y']
             safe_loop -= 1
             MAP.ypixelmap[x][y] = False
-            write_map_to_image(_config)
+            IMAGER.write_map_to_image(MAP.ypixelmap)
         else:
             pn0 = randrange(len_deadlocks)
             p0 = deadlocks[pn0]
@@ -364,7 +333,7 @@ def connect_deadlocks_loop(_config):
                 x = p0['x']
                 y = p0['y']
                 MAP.ypixelmap[x][y] = False
-                write_map_to_image(_config)
+                IMAGER.write_map_to_image(MAP.ypixelmap)
             else:
                 safe_loop -= 1
         deadlocks = find_deadlock_points()
@@ -377,7 +346,7 @@ def remove_deadlocks_loop(_config):
         x = deadlocks[0]['x']
         y = deadlocks[0]['y']
         MAP.ypixelmap[x][y] = False
-        write_map_to_image(_config)
+        IMAGER.write_map_to_image(MAP.ypixelmap)
         deadlocks = find_deadlock_points()
         len_deadlocks = len(deadlocks)
 
@@ -413,7 +382,9 @@ Arg can be:
             "ERROR: could not load roadmapgen2d-config.json" + tips
         )
 
-    MAP = RoadMapGen2dMap(config)
+    IMAGER = RoadMapGen2dWriteMapToImage(config)
+    MAP = RoadMapGen2dMap(config, IMAGER)
+    
 
     if not os.path.isdir(".roads-generation"):
         os.mkdir('.roads-generation')
@@ -468,11 +439,13 @@ Arg can be:
         remove_rames(config)
         print_map()
         print("------- done -------")
-        write_map_to_image(config)
+        IMAGER.write_map_to_image(MAP.ypixelmap)
         print_map()
 
-    print("All frames: " + str(roads_generation_n))
-    frames_per_secons = round(roads_generation_n/82)
+    frames_per_secons = IMAGER.get_number_of_frames()
+    print("All frames: " + str(frames_per_secons))
+    frames_per_secons = round(frames_per_secons / 82)
+    
 
     # make video
     if os.path.isfile('video.avi'):
@@ -481,7 +454,7 @@ Arg can be:
     if config.is_create_video():
         # last frame in last 5 seconds
         for _ in range(frames_per_secons*5):
-            write_map_to_image(config)
+            IMAGER.write_map_to_image(MAP.ypixelmap)
 
         print("Frames per second: " + str(frames_per_secons))
         os.system('ffmpeg -f image2 -r ' + str(frames_per_secons) + ' -i .roads-generation/roadmap%06d.png -i "../app/music/sea5kg - 02 Diphdo.ogg" -acodec libmp3lame -b 192k video.avi')

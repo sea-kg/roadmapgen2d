@@ -1,6 +1,9 @@
 {
-    "map-width": 42,
-    "map-height": 42,
+    "map-width-px": 5000,
+    "map-height-px": 5000,
+    "texture-tail-road-width-px": 120,
+    "texture-tail-road-height-px": 120,
     "random-max-points": 100,
-    "create-video": false
+    "create-video": false,
+    "create-last-frame-as-image": true
 }
