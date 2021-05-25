@@ -1,0 +1,32 @@
+# This will run on Travis' 'new' container-based infrastructure
+language: python
+
+os:
+  - linux
+
+branches:
+  only:
+    - main
+    - dev
+
+matrix:
+  include:
+    - dist: bionic
+
+python:
+  - "3.7"
+
+# Install dependencies
+
+install:
+  - pip install pypng
+  - pip install pylint
+  - pip install pytest
+
+# Build your code e.g. by calling make
+script:
+  - ./tests/run_tests.sh
+
+notifications:
+  email:
+    - mrseakg@gmail.com
