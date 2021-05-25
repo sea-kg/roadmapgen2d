@@ -11,10 +11,8 @@ import json
 class RoadMapGen2dConfig:
     """ class for read config of generation image """
     # default values
-    __map_width = 50
-    __map_height = 50
-    __tex_road_width = 120
-    __tex_road_height = 120
+    __map_size = {"width": 50, "height": 50 }
+    __tex_road_size_px = {"width": 120, "height": 120 }
     __map_width_px = 5000
     __map_height_px = 5000
     __random_max_points = 100
@@ -33,12 +31,14 @@ class RoadMapGen2dConfig:
         self.__filepath = filepath
         with open(self.__filepath,) as file_cfg:
             data = json.load(file_cfg)
-            self.__tex_road_width = data['texture-tail-road-width-px']
-            self.__tex_road_height = data['texture-tail-road-height-px']
+            self.__tex_road_size_px['width'] = data['texture-tail-road-width-px']
+            self.__tex_road_size_px['height'] = data['texture-tail-road-height-px']
             self.__map_width_px = data['map-width-px']
             self.__map_height_px = data['map-height-px']
-            self.__map_width = int(self.__map_width_px/self.__tex_road_width)
-            self.__map_height = int(self.__map_height_px/self.__tex_road_height)
+            self.__map_size["width"] = int(self.__map_width_px / self.__tex_road_size_px['width'])
+            self.__map_size["height"] = int(
+                self.__map_height_px / self.__tex_road_size_px['height']
+            )
             self.__create_video = data['create-video']
             self.__random_max_points = data['random-max-points']
             self.__create_last_frame_as_image = data['create-last-frame-as-image']
@@ -61,10 +61,10 @@ class RoadMapGen2dConfig:
         return (_red, _green, _blue)
 
     def get_map_width(self):
-        return self.__map_width
+        return self.__map_size["width"]
 
     def get_map_height(self):
-        return self.__map_height
+        return self.__map_size["height"]
 
     def is_create_video(self):
         return self.__create_video

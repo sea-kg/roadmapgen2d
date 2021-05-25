@@ -3,7 +3,7 @@
     "map-height-px": 5000,
     "texture-tail-road-width-px": 120,
     "texture-tail-road-height-px": 120,
-    "random-max-points": 100,
+    "random-max-points": 75,
     "create-video": false,
     "color-hex-background": "000000",
     "color-hex-line-road": "FFFFFF",

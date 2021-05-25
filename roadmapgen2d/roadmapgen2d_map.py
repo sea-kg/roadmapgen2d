@@ -36,9 +36,9 @@ class RoadMapGen2dMap:
 
     def is_border(self, point_x, point_y):
         """ is_border """
-        if point_x == 0 or point_x == self.__max_width - 1:
+        if point_x in (0, self.__max_width - 1):
             return True
-        if point_y == 0 or point_y == self.__max_height - 1:
+        if point_y in (0, self.__max_height - 1):
             return True
         return False
 
