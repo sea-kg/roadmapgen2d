@@ -5,7 +5,10 @@
 """Library for cpplint"""
 
 from roadmapgen2d.__pkginfo__ import version as __version__
+
 from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
+from roadmapgen2d.roadmapgen2d_color import RoadMapGen2dColor
 from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
 from roadmapgen2d.roadmapgen2d_map import RoadMapGen2dMap
 from roadmapgen2d.roadmapgen2d_mod_random_points import RoadMapGen2dModRandomPoints
+from roadmapgen2d.roadmapgen2d_size import RoadMapGen2dSize

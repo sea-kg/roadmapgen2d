@@ -20,6 +20,8 @@ Create the some dir with file `roadmapgen2d-config.json`:
     "texture-tail-road-width-px": 120,
     "texture-tail-road-height-px": 120,
     "random-max-points": 100,
+    "color-hex-background": "000000",
+    "color-hex-line-road": "FFFFFF",
     "create-video": false,
     "create-last-frame-as-image": true
 }
