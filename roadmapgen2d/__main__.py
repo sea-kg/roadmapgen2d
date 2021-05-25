@@ -57,7 +57,7 @@ def get_around_count(x, y):
     ret = 0
     for dx in range(3):
         for dy in range(3):
-            x0 = x + dx - 1 
+            x0 = x + dx - 1
             y0 = y + dy - 1
             if x0 == x and y0 == y:
                 continue
@@ -445,12 +445,11 @@ Arg can be:
     frames_per_secons = IMAGER.get_number_of_frames()
     print("All frames: " + str(frames_per_secons))
     frames_per_secons = round(frames_per_secons / 82)
-    
 
     # make video
     if os.path.isfile('video.avi'):
         os.remove('video.avi')
-    
+
     IMAGER.write_last_frame_to_image(MAP.ypixelmap)
 
     if config.is_create_video():
