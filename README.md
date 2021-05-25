@@ -4,3 +4,28 @@
 
 Road Map Generator for 2d Maps
 
+![screen](https://raw.githubusercontent.com/sea-kg/roadmapgen2d/main/screen.png)
+
+## Install
+
+```
+$ pip3 install roadmapgen2d
+```
+
+Create the some dir with file `roadmapgen2d-config.json`:
+```
+{
+    "map-width-px": 5000,
+    "map-height-px": 5000,
+    "texture-tail-road-width-px": 120,
+    "texture-tail-road-height-px": 120,
+    "random-max-points": 100,
+    "create-video": false,
+    "create-last-frame-as-image": true
+}
+```
+
+And than in this directory run:
+```
+$ python3 -m roadmapgen2d .
+```
