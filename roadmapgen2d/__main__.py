@@ -141,27 +141,27 @@ def remove_single_points(_config):
 
 def is_rame(point_x, point_y):
     """ is_rame """
-    if MAP.is_border(point_x, point_y):
+    if MAP.is_border(point_x, point_y) or not MAP.ypixelmap[point_x][point_y]:
         return False
-    if not MAP.ypixelmap[point_x][point_y]:
-        return False
-    b00 = MAP.ypixelmap[point_x-1][point_y-1]
     b01 = MAP.ypixelmap[point_x-1][point_y]
-    b02 = MAP.ypixelmap[point_x-1][point_y+1]
     b10 = MAP.ypixelmap[point_x  ][point_y-1]
-    # b11 = ypixelmap[x  ][y]
     b12 = MAP.ypixelmap[point_x  ][point_y+1]
-    b20 = MAP.ypixelmap[point_x+1][point_y-1]
     b21 = MAP.ypixelmap[point_x+1][point_y]
-    b22 = MAP.ypixelmap[point_x+1][point_y+1]
-
-    if b00 and b01 and b02 and not b10 and not b12 and not b20 and not b21 and not b22:
+    col0 = MAP.has_left_column3(point_x, point_y)
+    not_col0 = MAP.has_not_left_column3(point_x, point_y)
+    col2 = MAP.has_right_column3(point_x, point_y)
+    not_col2 = MAP.has_not_right_column3(point_x, point_y)
+    row0 = MAP.has_top_row3(point_x, point_y)
+    not_row0 = MAP.has_not_top_row3(point_x, point_y)
+    row2 = MAP.has_bottom_row3(point_x, point_y)
+    not_row2 = MAP.has_not_bottom_row3(point_x, point_y)
+    if col0 and not_col2 and not b10 and not b12:
         return True
-    if b20 and b21 and b22 and not b00 and not b01 and not b02 and not b10 and not b12:
+    if col2 and not_col0 and not b10 and not b12:
         return True
-    if b00 and b10 and b20 and not b02 and not b12 and not b22 and not b01 and not b21:
+    if row0 and not_row2 and not b01 and not b21:
         return True
-    if b02 and b12 and b22 and not b00 and not b10 and not b20 and not b01 and not b21:
+    if row2 and not_row0 and not b01 and not b21:
         return True
     return False
 

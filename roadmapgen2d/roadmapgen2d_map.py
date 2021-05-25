@@ -68,6 +68,62 @@ class RoadMapGen2dMap:
             return False
         return True
 
+    def has_right_column3(self, point_x, point_y):
+        """ has right column3 """
+        b20 = self.ypixelmap[point_x+1][point_y-1]
+        b21 = self.ypixelmap[point_x+1][point_y]
+        b22 = self.ypixelmap[point_x+1][point_y+1]
+        return b20 and b21 and b22
+
+    def has_not_right_column3(self, point_x, point_y):
+        """ has not right column3 """
+        b20 = self.ypixelmap[point_x+1][point_y-1]
+        b21 = self.ypixelmap[point_x+1][point_y]
+        b22 = self.ypixelmap[point_x+1][point_y+1]
+        return not b20 and not b21 and not b22
+
+    def has_left_column3(self, point_x, point_y):
+        """ has left column3 """
+        b00 = self.ypixelmap[point_x-1][point_y-1]
+        b01 = self.ypixelmap[point_x-1][point_y]
+        b02 = self.ypixelmap[point_x-1][point_y+1]
+        return b00 and b01 and b02
+
+    def has_not_left_column3(self, point_x, point_y):
+        """ has left column3 """
+        b00 = self.ypixelmap[point_x-1][point_y-1]
+        b01 = self.ypixelmap[point_x-1][point_y]
+        b02 = self.ypixelmap[point_x-1][point_y+1]
+        return not b00 and not b01 and not b02
+
+    def has_top_row3(self, point_x, point_y):
+        """ has top row3 """
+        b00 = self.ypixelmap[point_x-1][point_y-1]
+        b10 = self.ypixelmap[point_x  ][point_y-1]
+        b20 = self.ypixelmap[point_x+1][point_y-1]
+        return b00 and b10 and b20
+
+    def has_not_top_row3(self, point_x, point_y):
+        """ has not top row3 """
+        b00 = self.ypixelmap[point_x-1][point_y-1]
+        b10 = self.ypixelmap[point_x  ][point_y-1]
+        b20 = self.ypixelmap[point_x+1][point_y-1]
+        return not b00 and not b10 and not b20
+
+    def has_bottom_row3(self, point_x, point_y):
+        """ has bottom row3 """
+        b02 = self.ypixelmap[point_x-1][point_y+1]
+        b12 = self.ypixelmap[point_x  ][point_y+1]
+        b22 = self.ypixelmap[point_x+1][point_y+1]
+        return b02 and b12 and b22
+
+    def has_not_bottom_row3(self, point_x, point_y):
+        """ has not bottom row3 """
+        b02 = self.ypixelmap[point_x-1][point_y+1]
+        b12 = self.ypixelmap[point_x  ][point_y+1]
+        b22 = self.ypixelmap[point_x+1][point_y+1]
+        return not b02 and not b12 and not b22
+
     def print_map(self):
         """ print map to console """
         for line in self.ypixelmap:

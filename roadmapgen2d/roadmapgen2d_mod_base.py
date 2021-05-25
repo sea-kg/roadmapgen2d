@@ -11,14 +11,16 @@ from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToI
 
 class RoadMapGen2dModBase:
     """ class base-modificator """
+    # private
     __name = "Base"
-    __imager: RoadMapGen2dWriteMapToImage = None
-    __config: RoadMapGen2dConfig = None
+    # protected
+    _imager: RoadMapGen2dWriteMapToImage = None
+    _config: RoadMapGen2dConfig = None
 
     def __init__(self, config, imager, name):
         self.__name = name
-        self.__imager = imager
-        self.__config = config
+        self._imager = imager
+        self._config = config
 
     def get_name(self):
         """ return name """

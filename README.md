@@ -11,6 +11,10 @@ Road Map Generator for 2d Maps
 ```
 $ pip3 install roadmapgen2d
 ```
+or 
+```
+$ pip3 install --upgrade roadmapgen2d
+```
 
 Create the some dir with file `roadmapgen2d-config.json`:
 ```

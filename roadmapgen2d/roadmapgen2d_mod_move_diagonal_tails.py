@@ -6,19 +6,13 @@
 
 """ simple map """
 from random import randrange
-from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
-from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
 from roadmapgen2d.roadmapgen2d_mod_base import RoadMapGen2dModBase
 
 class RoadMapGen2dModMoveDiagonalTails(RoadMapGen2dModBase):
     """ class modificator move diagonal tails """
-    __imager: RoadMapGen2dWriteMapToImage = None
-    __config: RoadMapGen2dConfig = None
 
     def __init__(self, config, imager):
         super().__init__(config, imager, "Move Diagonal Tails")
-        self.__imager = imager
-        self.__config = config
 
     def modify(self, _map):
         """ move_diagonal_tails loop """
@@ -53,14 +47,14 @@ class RoadMapGen2dModMoveDiagonalTails(RoadMapGen2dModBase):
             ret += 1
             _map.ypixelmap[point_x+1][point_y+1] = False
             if randrange(2) == 0:
-                _map.try_change_to_true(self.__config, point_x, point_y+1)
+                _map.try_change_to_true(self._config, point_x, point_y+1)
             else:
-                _map.try_change_to_true(self.__config, point_x+1, point_y)
+                _map.try_change_to_true(self._config, point_x+1, point_y)
         if not b11 and not b22 and b12 and b21:
             ret += 1
             _map.ypixelmap[point_x][point_y+1] = False
             if randrange(2) == 0:
-                _map.try_change_to_true(self.__config, point_x, point_y)
+                _map.try_change_to_true(self._config, point_x, point_y)
             else:
-                _map.try_change_to_true(self.__config, point_x+1, point_y+1)
+                _map.try_change_to_true(self._config, point_x+1, point_y+1)
         return ret
