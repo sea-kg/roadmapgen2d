@@ -33,12 +33,8 @@ class RoadMapGen2dWriteMapToImage:
     def get_number_of_frames(self):
         return self.__number
 
-    def write_map_to_image(self, _ypixelmap):
-        # filename
-        filename = self.__next_filename()
-        if not self.__config.is_create_video():
-            return
-        print("Write to file " + filename)
+    def __write_frame(self, _ypixelmap, _filename):
+        print("Write to file " + _filename)
         cell_size = 10
         img = []
         for line in _ypixelmap:
@@ -46,15 +42,31 @@ class RoadMapGen2dWriteMapToImage:
             for i in range(cell_size):
                 rows.append(())
             for cell in line:
-                _cell = (0, 0, 0)
+                _cell = self.__config.get_color_rgb_background()
                 if cell is True:
-                    _cell = (255, 255, 255)
+                    _cell = self.__config.get_color_rgb_line_road()
                 for i in range(cell_size):
                     for _ in range(cell_size):
                         rows[i] += _cell
-
             for i in range(cell_size):
                 img.append(rows[i])
-        with open(filename, 'wb') as f:
-            w = png.Writer(self.__max_width*cell_size, self.__max_height*cell_size, greyscale=False)
-            w.write(f, img)
+        with open(_filename, 'wb') as _file:
+            _png = png.Writer(
+                self.__max_width*cell_size,
+                self.__max_height*cell_size,
+                greyscale=False
+            )
+            _png.write(_file, img)
+
+    def write_map_to_image(self, _ypixelmap):
+        # filename
+        _filename = self.__next_filename()
+        if not self.__config.is_create_video():
+            return
+        self.__write_frame(_ypixelmap, _filename)
+
+    def write_last_frame_to_image(self, _ypixelmap):
+        if not self.__config.is_create_last_frame_as_image():
+            return
+        _filename = 'roadmapgen2d-result.png'
+        self.__write_frame(_ypixelmap, _filename)

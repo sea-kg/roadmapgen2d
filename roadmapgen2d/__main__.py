@@ -450,6 +450,8 @@ Arg can be:
     # make video
     if os.path.isfile('video.avi'):
         os.remove('video.avi')
+    
+    IMAGER.write_last_frame_to_image(MAP.ypixelmap)
 
     if config.is_create_video():
         # last frame in last 5 seconds
