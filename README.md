@@ -35,3 +35,19 @@ And than in this directory run:
 ```
 $ python3 -m roadmapgen2d .
 ```
+
+## Create video for algorithm work
+
+Requirements:
+
+* ffmpeg
+
+How it works:
+
+In this progress, script will be write frames (step by step) to `.roads-generation/.roads-generation/roadmap*.png`
+
+and then script will be call `ffmpeg` command:
+
+```
+ffmpeg -f image2 -r 15 -i .roads-generation/roadmap%06d.png video.mp4
+```

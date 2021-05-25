@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* checking code by pylint
-* tests
+* test pylint
+* test colors
 
 ## [v0.0.2] - 2021-05-25 (2021 May 25)
 
