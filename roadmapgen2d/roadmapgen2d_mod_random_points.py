@@ -8,23 +8,17 @@
 from random import randrange
 from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
 from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
+from roadmapgen2d.roadmapgen2d_mod_base import RoadMapGen2dModBase
 
-class RoadMapGen2dModRandomPoints:
-    """ class for read config of generation image """
-    __max_width = None
-    __max_height = None
-    __name = "Random Points"
+class RoadMapGen2dModRandomPoints(RoadMapGen2dModBase):
+    """ class modificator for random points on map """
     __imager: RoadMapGen2dWriteMapToImage = None
     __config: RoadMapGen2dConfig = None
-    ypixelmap = []
 
     def __init__(self, config, imager):
+        super().__init__(config, imager, "Random Points")
         self.__imager = imager
         self.__config = config
-
-    def get_name(self):
-        """ return mod name """
-        return self.__name
 
     def modify(self, _map):
         """ random points """
@@ -36,3 +30,5 @@ class RoadMapGen2dModRandomPoints:
             point_y = randrange(max_ph - 2) + 1
             if _map.try_change_to_true(self.__config, point_x, point_y):
                 immp += 1
+        print("------- " + self.get_name() + " -------")
+        _map.print_map()

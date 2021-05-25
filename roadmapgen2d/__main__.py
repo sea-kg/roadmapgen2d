@@ -16,21 +16,10 @@ from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
 from roadmapgen2d.roadmapgen2d_map import RoadMapGen2dMap
 from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
 from roadmapgen2d.roadmapgen2d_mod_random_points import RoadMapGen2dModRandomPoints
+from roadmapgen2d.roadmapgen2d_mod_move_diagonal_tails import RoadMapGen2dModMoveDiagonalTails
 
 MAP = None
 IMAGER = None
-
-def print_map():
-    """ print map to console """
-    for line in MAP.ypixelmap:
-        res_line = ''
-        for i in line:
-            if i is True:
-                _format = '0;30;47'
-            else:
-                _format = '2;31;40'
-            res_line += '\x1b[%sm  \x1b[0m' % (_format)
-        print(res_line)
 
 def get_around_count(point_x, point_y):
     """ get_around_count """
@@ -100,49 +89,6 @@ def find_deadlock_points():
             point_y += 1
         point_x += 1
     return deadlock_points
-
-def check_and_random_move(_config, point_x, point_y):
-    """ check_and_random_move """
-    if MAP.is_border(point_x, point_y):
-        return False
-    ret = 0
-    b11 = MAP.ypixelmap[point_x  ][point_y  ]
-    b12 = MAP.ypixelmap[point_x  ][point_y+1]
-    b22 = MAP.ypixelmap[point_x+1][point_y+1]
-    b21 = MAP.ypixelmap[point_x+1][point_y  ]
-    if b11 and b22 and not b12 and not b21:
-        ret += 1
-        MAP.ypixelmap[point_x+1][point_y+1] = False
-        if randrange(2) == 0:
-            MAP.try_change_to_true(_config, point_x, point_y+1)
-        else:
-            MAP.try_change_to_true(_config, point_x+1, point_y)
-    if not b11 and not b22 and b12 and b21:
-        ret += 1
-        MAP.ypixelmap[point_x][point_y+1] = False
-        if randrange(2) == 0:
-            MAP.try_change_to_true(_config, point_x, point_y)
-        else:
-            MAP.try_change_to_true(_config, point_x+1, point_y+1)
-    return ret
-
-def move_diagonal_tails(_config):
-    """ move_diagonal_tails """
-    point_x = 0
-    ret = 0
-    for x_line in MAP.ypixelmap:
-        point_y = 0
-        for _ in x_line:
-            ret += check_and_random_move(_config, point_x, point_y)
-            point_y += 1
-        point_x += 1
-    return ret
-
-def move_diagonal_tails_loop(_config):
-    """ move_diagonal_tails_loop """
-    mdt = move_diagonal_tails(_config)
-    while mdt > 0:
-        mdt = move_diagonal_tails(_config,)
 
 def drawline_by_y(_config, point_x0, point_x1, point_y):
     """ drawline_by_y """
@@ -386,6 +332,7 @@ Arg can be:
     IMAGER = RoadMapGen2dWriteMapToImage(config)
     MAP = RoadMapGen2dMap(config, IMAGER)
     mod_random = RoadMapGen2dModRandomPoints(config, IMAGER)
+    mod_move_diagonal_tails = RoadMapGen2dModMoveDiagonalTails(config, IMAGER)
 
     if not os.path.isdir(".roads-generation"):
         os.mkdir('.roads-generation')
@@ -395,9 +342,7 @@ Arg can be:
     with open('roadmapgen2d-config.json',) as file_map:
         data = json.load(file_map)
         mod_random.modify(MAP)
-        print_map()
-        move_diagonal_tails_loop(config)
-        print_map()
+        mod_move_diagonal_tails.modify(MAP)
         AGAIN = True
         while AGAIN:
             points = find_single_points()
@@ -409,45 +354,42 @@ Arg can be:
             p0 = points[randrange(LEN_POINTS)]
             p1 = points[randrange(LEN_POINTS)]
             print(p0,p1)
-            connect_points(config, p0,p1)
-            move_diagonal_tails_loop(config)
-            print_map()
+            connect_points(config, p0, p1)
+            mod_move_diagonal_tails.modify(MAP)
 
         # remove last single point
         remove_single_points(config)
         remove_rames(config)
         connect_all_close_points(config)
 
-        print_map()
+        MAP.print_map()
         print("------- remove_all_short_cicles -------")
         remove_all_short_cicles_loop(config)
-        print_map()
+        MAP.print_map()
         print("------- remove_rames -------")
         remove_rames(config)
-        print_map()
+        MAP.print_map()
 
-        print("------- move_diagonal_tails_loop -------")
-        move_diagonal_tails_loop(config)
-        print_map()
+        mod_move_diagonal_tails.modify(MAP)
 
         print("------- connect_deadlocks_loop -------")
         connect_deadlocks_loop(config)
         # move_diagonal_tails_loop(config)
-        print_map()
+        MAP.print_map()
 
         print("------- remove_all_short_cicles_loop -------")
         remove_all_short_cicles_loop(config)
-        print_map()
+        MAP.print_map()
 
         remove_rames(config)
-        move_diagonal_tails_loop(config)
+        mod_move_diagonal_tails.modify(MAP)
         remove_deadlocks_loop(config)
         remove_single_points(config)
         remove_rames(config)
-        print_map()
-        print("------- done -------")
+        MAP.print_map()
         IMAGER.write_map_to_image(MAP.ypixelmap)
-        print_map()
+        print("------- FINAL -------")
+        MAP.print_map()
 
     print("All frames: " + str(IMAGER.get_number_of_frames()))
     FRAMES_PER_SECOND = 15

@@ -67,3 +67,15 @@ class RoadMapGen2dMap:
             self.__imager.write_map_to_image(self.ypixelmap)
             return False
         return True
+
+    def print_map(self):
+        """ print map to console """
+        for line in self.ypixelmap:
+            res_line = ''
+            for i in line:
+                if i is True:
+                    _format = '0;30;47'
+                else:
+                    _format = '2;31;40'
+                res_line += '\x1b[%sm  \x1b[0m' % (_format)
+            print(res_line)

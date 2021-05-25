@@ -11,4 +11,5 @@ from roadmapgen2d.roadmapgen2d_color import RoadMapGen2dColor
 from roadmapgen2d.roadmapgen2d_config import RoadMapGen2dConfig
 from roadmapgen2d.roadmapgen2d_map import RoadMapGen2dMap
 from roadmapgen2d.roadmapgen2d_mod_random_points import RoadMapGen2dModRandomPoints
+from roadmapgen2d.roadmapgen2d_mod_move_diagonal_tails import RoadMapGen2dModMoveDiagonalTails
 from roadmapgen2d.roadmapgen2d_size import RoadMapGen2dSize
