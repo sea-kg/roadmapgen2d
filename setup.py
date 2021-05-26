@@ -8,7 +8,7 @@ with open('README.md', 'r') as fh:
 setuptools.setup(
     name='roadmapgen2d',
     version='0.0.4',
-    install_requires=[],
+    install_requires=['pypng'],
     keywords=['roadmap', 'generator', '2d'],
     author='Evgenii Sopov',
     author_email='mrseakg@gmail.com',
