@@ -7,7 +7,7 @@
 """roadmapgen2d packaging information"""
 
 # For an official release, use dev_version = None
-numversion = (0, 0, 3)
+numversion = (0, 0, 4)
 
 version = ".".join(str(num) for num in numversion)
 name = "roadmapgen2d"
