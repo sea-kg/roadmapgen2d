@@ -21,6 +21,7 @@ class RoadMapGen2dConfig:
     __create_last_frame_as_image = True
     __color_background = RoadMapGen2dColor("000000")
     __color_line_road = RoadMapGen2dColor("FFFFFF")
+    __color_line_road_use_gradient = False
 
     def __init__(self):
         self.__filepath = 'roadmapgen2d-config.json'
@@ -44,6 +45,7 @@ class RoadMapGen2dConfig:
             self.__create_last_frame_as_image = data['create-last-frame-as-image']
             self.__color_background.parse_from_json(data, 'color-hex-background')
             self.__color_line_road.parse_from_json(data, 'color-hex-line-road')
+            self.__color_line_road_use_gradient = data["color-line-road-use-gradient"]
             return True
         return False
 
@@ -74,3 +76,7 @@ class RoadMapGen2dConfig:
     def get_color_rgb_line_road(self):
         """ get_color_rgb_line_road """
         return self.__color_line_road.get_rgb()
+
+    def is_color_line_road_use_gradient(self):
+        """ is_color_line_road_use_gradient """
+        return self.__color_line_road_use_gradient

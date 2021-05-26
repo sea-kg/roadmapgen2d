@@ -6,6 +6,7 @@
     "random-max-points": 75,
     "color-hex-background": "000000",
     "color-hex-line-road": "FFFFFF",
+    "color-line-road-use-gradient": false,
     "create-video": false,
     "create-last-frame-as-image": true
 }

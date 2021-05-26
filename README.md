@@ -26,6 +26,7 @@ Create the some dir with file `roadmapgen2d-config.json`:
     "random-max-points": 100,
     "color-hex-background": "000000",
     "color-hex-line-road": "FFFFFF",
+    "color-line-road-use-gradient": true,
     "create-video": false,
     "create-last-frame-as-image": true
 }

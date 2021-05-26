@@ -37,19 +37,23 @@ class RoadMapGen2dWriteMapToImage:
         print("Write to file " + _filename)
         cell_size = 10
         img = []
+        point_y = 0
         for line in _ypixelmap:
             rows = []
+            point_x = 0
             for i in range(cell_size):
                 rows.append(())
             for cell in line:
                 _cell = self.__config.get_color_rgb_background()
                 if cell is True:
-                    _cell = self.__config.get_color_rgb_line_road()
+                    _cell = self.get_color_rgb_line_road(point_y, point_x)
                 for i in range(cell_size):
                     for _ in range(cell_size):
                         rows[i] += _cell
+                point_x += 1
             for i in range(cell_size):
                 img.append(rows[i])
+            point_y += 1
         with open(_filename, 'wb') as _file:
             _png = png.Writer(
                 self.__max_width*cell_size,
@@ -70,3 +74,11 @@ class RoadMapGen2dWriteMapToImage:
             return
         _filename = 'roadmapgen2d-result.png'
         self.__write_frame(_ypixelmap, _filename)
+
+    def get_color_rgb_line_road(self, point_y, point_x):
+        if not self.__config.is_color_line_road_use_gradient():
+            return self.__config.get_color_rgb_line_road()
+        _red = int(point_y*256 / self.__max_height)
+        _green = int(point_x*256 / self.__max_width)
+        _blue = 255
+        return (_red, _green, _blue)
