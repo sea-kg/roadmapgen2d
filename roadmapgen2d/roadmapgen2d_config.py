@@ -15,6 +15,7 @@ class RoadMapGen2dConfig:
     # default values
     __map_size = RoadMapGen2dSize(50,50)
     __tex_road_size_px = RoadMapGen2dSize(120, 120)
+    __tex_path = "textures/road0.png"
     __map_size_px = RoadMapGen2dSize(5000, 5000)
     __random_max_points = 100
     __create_video = False
@@ -33,6 +34,7 @@ class RoadMapGen2dConfig:
             data = json.load(file_cfg)
             self.__tex_road_size_px.set_width(data['texture-tail-road-width-px'])
             self.__tex_road_size_px.set_height(data['texture-tail-road-height-px'])
+            self.__tex_path = data['texture-path']
             self.__map_size_px.parse_from_json(data, 'map-', '-px')
             self.__map_size.set_width(
                 int(self.__map_size_px.get_width() / self.__tex_road_size_px.get_width())
@@ -80,3 +82,15 @@ class RoadMapGen2dConfig:
     def is_color_line_road_use_gradient(self):
         """ is_color_line_road_use_gradient """
         return self.__color_line_road_use_gradient
+
+    def get_texture_path(self):
+        """ get_texture_path """
+        return self.__tex_path
+
+    def get_texture_width(self):
+        """ get_texture_width """
+        return self.__tex_road_size_px.get_width()
+
+    def get_texture_height(self):
+        """ get_texture_height """
+        return self.__tex_road_size_px.get_height()

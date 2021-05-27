@@ -130,4 +130,5 @@ dmypy.json
 
 # other
 roadmapgen2d-result.png
+roadmapgen2d-result.json
 .roads-generation

@@ -17,6 +17,7 @@ from roadmapgen2d.roadmapgen2d_map import RoadMapGen2dMap
 from roadmapgen2d.roadmapgen2d_write_map_to_image import RoadMapGen2dWriteMapToImage
 from roadmapgen2d.roadmapgen2d_mod_random_points import RoadMapGen2dModRandomPoints
 from roadmapgen2d.roadmapgen2d_mod_move_diagonal_tails import RoadMapGen2dModMoveDiagonalTails
+from roadmapgen2d.roadmapgen2d_export_to_json import RoadMapGen2dExportToJson
 
 MAP = None
 IMAGER = None
@@ -409,3 +410,6 @@ Arg can be:
         FFMPEG_COMMAND = 'ffmpeg -f image2 -r ' + str(FRAMES_PER_SECOND)
         FFMPEG_COMMAND += ' -i .roads-generation/roadmap%06d.png video.mp4'
         os.system(FFMPEG_COMMAND)
+
+    EXPORTER = RoadMapGen2dExportToJson(config, MAP.ypixelmap)
+    EXPORTER.write_map_to_json("roadmapgen2d-result.json")
