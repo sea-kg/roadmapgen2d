@@ -6,6 +6,7 @@
 
 """ reader for config """
 
+import os
 import json
 from roadmapgen2d.roadmapgen2d_size import RoadMapGen2dSize
 from roadmapgen2d.roadmapgen2d_color import RoadMapGen2dColor
@@ -30,6 +31,8 @@ class RoadMapGen2dConfig:
     def load_from_file(self, filepath):
         """ load config from a file """
         self.__filepath = filepath
+        if os.path.isfile(self.__filepath):
+            return False
         with open(self.__filepath,) as file_cfg:
             data = json.load(file_cfg)
             self.__tex_road_size_px.set_width(data['texture-tail-road-width-px'])
@@ -49,7 +52,6 @@ class RoadMapGen2dConfig:
             self.__color_line_road.parse_from_json(data, 'color-hex-line-road')
             self.__color_line_road_use_gradient = data["color-line-road-use-gradient"]
             return True
-        return False
 
     def get_map_width(self):
         """ get_map_width """
