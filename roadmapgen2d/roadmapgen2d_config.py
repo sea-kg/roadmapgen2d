@@ -31,7 +31,8 @@ class RoadMapGen2dConfig:
     def load_from_file(self, filepath):
         """ load config from a file """
         self.__filepath = filepath
-        if os.path.isfile(self.__filepath):
+        if not os.path.isfile(self.__filepath):
+            print(self.__filepath, " - file not found")
             return False
         with open(self.__filepath,) as file_cfg:
             data = json.load(file_cfg)
@@ -52,6 +53,7 @@ class RoadMapGen2dConfig:
             self.__color_line_road.parse_from_json(data, 'color-hex-line-road')
             self.__color_line_road_use_gradient = data["color-line-road-use-gradient"]
             return True
+        return False
 
     def get_map_width(self):
         """ get_map_width """

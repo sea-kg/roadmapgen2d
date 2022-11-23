@@ -1,10 +1,10 @@
 {
-    "map-width-px": 5000,
-    "map-height-px": 5000,
+    "map-width-px": 10000,
+    "map-height-px": 10000,
     "texture-tail-road-width-px": 120,
     "texture-tail-road-height-px": 120,
     "texture-path": "textures/road0.png",
-    "random-max-points": 75,
+    "random-max-points": 175,
     "color-hex-background": "000000",
     "color-hex-line-road": "FFFFFF",
     "color-line-road-use-gradient": false,

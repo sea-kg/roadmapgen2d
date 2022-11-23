@@ -322,9 +322,10 @@ Arg can be:
         sys.exit('ERROR: Directory "' + sys.argv[1] + '" did not exists.')
     print("Start on dir: " + ROOT_DIR)
     config = RoadMapGen2dConfig()
-    if not config.load_from_file('roadmapgen2d-config.json'):
+    confpath = os.path.join(ROOT_DIR, 'roadmapgen2d-config.json')
+    if not config.load_from_file(confpath):
         TIPS = ""
-        if not os.path.isfile('roadmapgen2d-config.json'):
+        if not os.path.isfile(confpath):
             TIPS = "\n  Note: for create use a --create-example-config"
         sys.exit(
             "ERROR: could not load roadmapgen2d-config.json" + TIPS
